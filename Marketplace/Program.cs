@@ -1,9 +1,17 @@
-var builder = WebApplication.CreateBuilder(args);
+using Marketplace.API.Mapping;
+using Marketplace.Domain.Entities;
+using Marketplace.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<MarketplaceDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MarketplaceDbConnection")));
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
