@@ -12,5 +12,5 @@ public class MarketplaceDbContext: DbContext
 {
     public MarketplaceDbContext(DbContextOptions<MarketplaceDbContext> options) : base(options){ }
     public DbSet<Product> Products => Set<Product>();
-
+    public DbSet<User> Users => Set<User>();
 }

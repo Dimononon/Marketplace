@@ -2,14 +2,16 @@
 using Marketplace.API.DTOs;
 using Marketplace.Domain.Entities;
 using Marketplace.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : Controller
+public class ProductsController : ControllerBase
 {
     private readonly MarketplaceDbContext _context;
     private readonly IMapper _mapper;
@@ -32,6 +34,7 @@ public class ProductsController : Controller
         return Ok(_mapper.Map<ProductReadDto>(product));
     }
     [HttpPost]
+    [Authorize(Roles = "Seller")]
     public async Task<ActionResult<ProductReadDto>> Create(ProductCreateDto dto)
     {
         var product = _mapper.Map<Product>(dto);
@@ -41,6 +44,7 @@ public class ProductsController : Controller
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Seller")]
     public async Task<IActionResult> Update(Guid id, ProductCreateDto dto)
     {
         var product = await _context.Products.FindAsync(id);
@@ -52,6 +56,7 @@ public class ProductsController : Controller
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Seller")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var product = await _context.Products.FindAsync(id);
