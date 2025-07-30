@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Marketplace.Domain.Entities;
 
-public class User
+public class Role
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string Username { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
+    public string Name { get; set; }
+    [JsonIgnore]
     public ICollection<UserRole> UserRoles { get; set; }
 }

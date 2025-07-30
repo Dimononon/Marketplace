@@ -5,6 +5,7 @@ using Marketplace.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Marketplace.API.Controllers;
 
@@ -38,6 +39,10 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<ProductReadDto>> Create(ProductCreateDto dto)
     {
         var product = _mapper.Map<Product>(dto);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+            return Unauthorized();
+        product.SellerId = Guid.Parse(userId);
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, _mapper.Map<ProductReadDto>(product));
@@ -47,20 +52,25 @@ public class ProductsController : ControllerBase
     [Authorize(Roles = "Seller")]
     public async Task<IActionResult> Update(Guid id, ProductCreateDto dto)
     {
-        var product = await _context.Products.FindAsync(id);
-        if (product == null) return NotFound();
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id && p.SellerId == userId);
+
+        if (product == null)
+            return NotFound("Product not found or you are not the owner.");
 
         _mapper.Map(dto, product);
         await _context.SaveChangesAsync();
-        return NoContent();
+        return Ok(dto);
     }
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Seller")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var product = await _context.Products.FindAsync(id);
-        if (product == null) return NotFound();
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id && p.SellerId == userId);
+        if (product == null)
+            return NotFound("Product not found or you are not the owner.");
 
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();

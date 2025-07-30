@@ -17,5 +17,7 @@ public class Product
     public int Quantity { get; set; }
     public string City { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public Guid SellerId { get; set; }
+    public User Seller { get; set; }
 }
 
