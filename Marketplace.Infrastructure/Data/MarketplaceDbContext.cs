@@ -36,6 +36,10 @@ public class MarketplaceDbContext : DbContext
             .HasForeignKey(o => o.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Order>()
+            .Property(o => o.Status)
+            .HasConversion<string>();
+
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Seller)
             .WithMany()

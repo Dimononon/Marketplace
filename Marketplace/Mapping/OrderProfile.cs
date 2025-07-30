@@ -10,6 +10,7 @@ public class OrderProfile : Profile
     {
         CreateMap<Order, OrderDto>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Title))
-            .ForMember(dest => dest.SellerName, opt => opt.MapFrom(src => src.Product.Seller.Username));
+            .ForMember(dest => dest.SellerName, opt => opt.MapFrom(src => src.Product.Seller.Username))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
     }
 }

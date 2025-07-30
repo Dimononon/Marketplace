@@ -87,4 +87,25 @@ public class OrdersController : ControllerBase
         var result = _mapper.Map<List<OrderDto>>(orders);
         return Ok(result);
     }
+    [HttpPut("{id}/status")]
+    [Authorize(Roles = "Seller")]
+    public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto dto)
+    {
+        var order = await _context.Orders
+            .Include(o => o.Product)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (order == null)
+            return NotFound("Order not found");
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (order.Product.SellerId.ToString() != userId)
+            return Forbid("You can only change status for your own product orders");
+
+        order.Status = dto.Status;
+        await _context.SaveChangesAsync();
+
+        return Ok("Order status updated");
+    }
 }

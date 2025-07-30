@@ -1,4 +1,6 @@
-﻿namespace Marketplace.API.DTOs;
+﻿using Marketplace.Domain.Entities;
+
+namespace Marketplace.API.DTOs;
 
 public class OrderDto
 {
@@ -8,4 +10,5 @@ public class OrderDto
     public int Quantity { get; set; }
     public decimal TotalPrice { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string Status { get; set; }
 }

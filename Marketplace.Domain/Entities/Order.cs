@@ -20,4 +20,5 @@ public class Order
 
     public int Quantity { get; set; }
     public decimal TotalPrice { get; set; }
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
 }
