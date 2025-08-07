@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Marketplace.Application.Services;
 using System.Text.Json.Serialization;
+using Marketplace.Application.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,7 +76,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Marketplace.API.DTOs;
 using Marketplace.Domain.Entities;
 using Marketplace.Infrastructure.Data;
@@ -22,10 +23,33 @@ public class ProductsController : ControllerBase
         _mapper = mapper;
     }
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] ProductQueryParameters query)
     {
-        var products = await _context.Products.ToListAsync();
-        return Ok(_mapper.Map<IEnumerable<ProductReadDto>>(products));
+        var productsQuery = _context.Products
+            .Include(p => p.Seller)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(query.Search))
+        {
+            productsQuery = productsQuery.Where(p =>
+                p.Title.Contains(query.Search) || p.Description.Contains(query.Search));
+        }
+
+        if (query.MinPrice.HasValue)
+        {
+            productsQuery = productsQuery.Where(p => p.Price >= query.MinPrice.Value);
+        }
+
+        if (query.MaxPrice.HasValue)
+        {
+            productsQuery = productsQuery.Where(p => p.Price <= query.MaxPrice.Value);
+        }
+
+        var products = await productsQuery
+        .ProjectTo<ProductReadDto>(_mapper.ConfigurationProvider)
+        .ToListAsync();
+
+        return Ok(products);
     }
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductReadDto>> GetById(Guid id)
